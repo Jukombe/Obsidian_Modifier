@@ -20,10 +20,10 @@ def copy_folders(destination_path, source_folders):
             print(f"failed to copy '{folder_name}': {e}")
 
 # Paths here:
-destination = "/home/florian/Obsidian-Vault/Public"
+destination = "Path/to/destination"
 sources = [
-    "/home/florian/Obsidian-Vault/01 - Schule",
-    "/home/florian/Obsidian-Vault/05 - Coding Shit",
+    "Path/to/source",
+    "Path/to/source",
 ]
 
 copy_folders(destination, sources)
