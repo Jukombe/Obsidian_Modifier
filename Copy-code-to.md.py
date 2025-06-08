@@ -1,11 +1,10 @@
 import os
-import shutil
 
-# ✅ Customize these paths
-SOURCE_FOLDER = r"C:\Programmier Stuff\folder 1"       # <- Where your code lives
-TARGET_FOLDER = r"C:\Programmier Stuff\folder 2"   # <- Where the .md files should go
+# ✅ Set your source and destination folders
+SOURCE_FOLDER = r"D:\Path\To\Your\Code"
+TARGET_FOLDER = r"D:\Path\To\Your\Markdowns"
 
-# ✅ File types you want to convert
+# ✅ Supported file extensions
 FILE_EXTENSIONS = [".py", ".html", ".css", ".js", ".ts", ".json", ".sh", ".bat"]
 
 # Mapping extensions to language names for markdown code blocks
@@ -20,36 +19,36 @@ LANGUAGE_MAP = {
     ".bat": "batch"
 }
 
-def convert_to_markdown(file_path, output_path):
-    ext = os.path.splitext(file_path)[1].lower()
-    language = LANGUAGE_MAP.get(ext, "")  # fallback: no language
-
+def convert_code_to_markdown(input_file_path, output_md_path, language):
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            code = f.read()
+        with open(input_file_path, "r", encoding="utf-8") as code_file:
+            code = code_file.read()
 
-        filename = os.path.basename(file_path)
-        md_filename = os.path.splitext(filename)[0] + ".md"
-        md_path = os.path.join(output_path, md_filename)
+        with open(output_md_path, "w", encoding="utf-8") as md_file:
+            filename = os.path.basename(input_file_path)
+            md_file.write(f"# {filename}\n\n")
+            md_file.write(f"```{language}\n{code}\n```")
 
-        with open(md_path, "w", encoding="utf-8") as f:
-            f.write(f"# {filename}\n\n")
-            f.write(f"```{language}\n{code}\n```")
-
-        print(f"✅ Converted: {filename} → {md_filename}")
+        print(f"✅ {input_file_path} → {output_md_path}")
     except Exception as e:
-        print(f"❌ Error processing {file_path}: {e}")
+        print(f"❌ Error with {input_file_path}: {e}")
 
-def process_folder(source, target):
-    if not os.path.exists(target):
-        os.makedirs(target)
-
-    for root, _, files in os.walk(source):
+def process_folder_recursive(source_root, target_root):
+    for root, _, files in os.walk(source_root):
         for file in files:
             ext = os.path.splitext(file)[1].lower()
             if ext in FILE_EXTENSIONS:
-                file_path = os.path.join(root, file)
-                convert_to_markdown(file_path, target)
+                rel_path = os.path.relpath(root, source_root)  # relative subfolder path
+                output_dir = os.path.join(target_root, rel_path)
+                os.makedirs(output_dir, exist_ok=True)
 
-process_folder(SOURCE_FOLDER, TARGET_FOLDER)
-print("\n🎉 Done! All code files have been embedded into Markdown.")
+                input_file_path = os.path.join(root, file)
+                base_name = os.path.splitext(file)[0] + ".md"
+                output_md_path = os.path.join(output_dir, base_name)
+
+                language = LANGUAGE_MAP.get(ext, "")
+                convert_code_to_markdown(input_file_path, output_md_path, language)
+
+# Run it
+process_folder_recursive(SOURCE_FOLDER, TARGET_FOLDER)
+print("\n🎉 All code files converted and saved with folder structure.")
