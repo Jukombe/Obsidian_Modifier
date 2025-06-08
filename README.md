@@ -1,2 +1,2 @@
 # Obsidian_Modifier
-Collection of AI slob code i use to monage my Obsidian Vault
+Collection of AI slob code i use to manage my Obsidian Vault
